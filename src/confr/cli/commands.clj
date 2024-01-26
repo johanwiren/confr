@@ -9,7 +9,7 @@
 ;; Helper-functions
 
 (defn- to-json [env]
-  (json/generate-string env))
+  (json/generate-string env {:pretty true}))
 
 (defn- pretty-printer [{:keys [format]}]
   (case format
