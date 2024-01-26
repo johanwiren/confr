@@ -131,5 +131,5 @@
         :fn usage}
        (with-help))])
 
-(defn -main [& args]
+(defn main [& args]
   (cli/dispatch dispatch-table args))

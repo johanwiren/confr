@@ -1,0 +1,4 @@
+[:map
+ {:registry {}}
+ [:admin-password :string]
+ [:server-port [:int {:min 1024 :max 65535}]]]

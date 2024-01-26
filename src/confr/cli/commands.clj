@@ -54,11 +54,13 @@
         results (->> envs
                      (map (juxt identity #(confr/validate schema (load-env % opts))))
                      (filter second))]
-    (when results
-      (doseq [[env errors] results]
-        (printer {:environment env
-                  :errors (me/humanize errors)}))
-      (System/exit 1))))
+    (when (seq results)
+      (doseq [[errorenv errors] results]
+        (printer (cond->> (me/humanize errors)
+                   (not env) (assoc {:environment errorenv}
+                              :errors))))
+      (System/exit 1))
+    (println (format "Environment %s is valid" env))))
 
 (defn generate [{:keys [opts]}]
   (let [printer (pretty-printer opts)]
