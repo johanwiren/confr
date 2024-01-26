@@ -35,7 +35,7 @@
   (-> cmd
       (update :spec assoc :no-resolve {:default false
                                        :coerce boolean
-                                       :desc "Do not resolve external values before processing"})))
+                                       :desc "Do not resolve external values before processing (implies no-validate)"})))
 
 (defn with-help [cmd]
   (let [cmd (update cmd :spec assoc :help {:default false

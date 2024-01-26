@@ -59,11 +59,13 @@
     (printer (dd/diff (load-env (first env) opts)
                       (load-env (second env) opts)))))
 
-(defn export [{{:keys [env no-validate] :as opts} :opts}]
+(defn export [{{:keys [env no-validate no-resolve] :as opts} :opts}]
   (let [env (load-env env opts)
         schema (confr/load-schema opts)
         formatter (formatter opts)
-        errors (and (not no-validate) (confr/validate schema env))]
+        errors (and (not no-validate)
+                    (not no-resolve)
+                    (confr/validate schema env))]
     (when errors
       (binding [*out* *err*]
         (println "Invalid environment")
