@@ -11,12 +11,12 @@
 (defn- to-json [env]
   (json/generate-string env))
 
-(defn- formatter [{:keys [format]}]
+(defn- pretty-printer [{:keys [format]}]
   (case format
-    "edn" pr-str
-    "json" to-json
-    "env-var" (comp confr/export-env-vars (partial sort-by first) confr/env-vars)
-    pr-str))
+    "edn" dd/pretty-print
+    "json" (comp println to-json)
+    "env-var" (comp println confr/export-env-vars (partial sort-by first) confr/env-vars)
+    (comp println pr-str)))
 
 (defn- load-env [env {:keys [no-resolve] :as opts}]
   (cond-> (confr/load-env env opts)
@@ -32,7 +32,7 @@
 ;; Commands
 
 (defn validate [{{:keys [env] :as opts} :opts}]
-  (let [formatter (formatter opts)
+  (let [printer (pretty-printer opts)
         schema (confr/load-schema opts)
         envs (if env [env] (find-envs opts))
         results (->> envs
@@ -40,19 +40,18 @@
                      (filter second))]
     (when results
       (doseq [[env errors] results]
-        (println (formatter {:environment env
-                             :errors (me/humanize errors)})))
+        (printer {:environment env
+                  :errors (me/humanize errors)}))
       (System/exit 1))))
 
 (defn generate [{:keys [opts]}]
-  (let [formatter (formatter opts)]
+  (let [printer (pretty-printer opts)]
     (-> (confr/load-schema opts)
         (confr/generate)
-        (formatter)
-        (println))))
+        (printer))))
 
-(defn diff [{{:keys [env format] :as opts} :opts}]
-  (let [printer (case format
+(defn diff [{{:keys [env] :as opts} :opts}]
+  (let [printer (pretty-printer opts) #_(case format
                   ;; FIXME: This doesn't work well in all diffs
                   "json" (comp println json/generate-string)
                   dd/pretty-print)]
@@ -62,7 +61,7 @@
 (defn export [{{:keys [env no-validate no-resolve] :as opts} :opts}]
   (let [env (load-env env opts)
         schema (confr/load-schema opts)
-        formatter (formatter opts)
+        printer (pretty-printer opts)
         errors (and (not no-validate)
                     (not no-resolve)
                     (confr/validate schema env))]
@@ -71,4 +70,4 @@
         (println "Invalid environment")
         (println (pr-str (me/humanize errors))))
       (System/exit 1))
-    (println (formatter env))))
+    (printer env)))

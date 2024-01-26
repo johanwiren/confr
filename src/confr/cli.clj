@@ -96,6 +96,7 @@
                      :require true}}
         :validate {:env #(= 2 (count %))}}
        (with-defaults)
+       (with-formats ["edn" "json"])
        (with-no-resolve)
        (with-help))
    (-> {:cmds ["export"]
