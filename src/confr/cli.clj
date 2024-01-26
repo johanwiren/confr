@@ -71,7 +71,7 @@
   (println "  export    exports an environment")
   (println "  diff      shows differences between environments")
   (println "  generate  generates a valid random environment")
-  (println "  serve     starts a http server serving the environment")
+  (println "  serve     starts an http server serving the environment")
   (println)
   (println "To get help for a command run:")
   (println "  confr <command> --help")
@@ -117,9 +117,11 @@
         :args->opts [:env]
         :spec {:env {:require true}
                :port {:coerce :int
-                      :default 8177}
+                      :default 8177
+                      :desc "Port number for http server"}
                :once {:coerce boolean
-                      :default false}}}
+                      :default true
+                      :desc "Shuts down after one request"}}}
        (with-defaults)
        (with-formats ["edn" "json"])
        (with-help))
