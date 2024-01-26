@@ -7,4 +7,5 @@
                   :file "dev.password"}}
  :optional/value "some-val"
  :truthy/value true
+ :deep/merge {:alice "from-dev"}
  :nested/map {:some 42}}

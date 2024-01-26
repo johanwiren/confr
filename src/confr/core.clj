@@ -15,6 +15,11 @@
       (edn/read-string)
       (mu/closed-schema)))
 
+(defn deep-merge [& xs]
+  (if (every? map? xs)
+    (apply merge-with deep-merge xs)
+    (last xs)))
+
 (declare load-env)
 
 (defn resolve-includes [{:confr/keys [include] :as env}
@@ -26,7 +31,7 @@
     (System/exit 1))
   (let [opts (update opts :loaded-includes (fnil into #{}) include)]
     (->> (conj (mapv #(load-env % opts) include) (dissoc env :confr/include))
-         (apply merge))))
+         (apply deep-merge))))
 
 (defn load-env [env {:keys [conf-dir] :as opts}]
   (resolve-includes (edn/read-string (slurp (format "%s/environments/%s.edn" conf-dir env))) opts))

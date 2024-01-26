@@ -6,4 +6,5 @@
  [:truthy/value :boolean]
  [:nested/map [:map [:some :int]]]
  [:nested [:map [:inner :string]]]
- [:include/json [:map [:a [:map [:nested [:vector :string]]]]]]]
+ [:include/json [:map [:a [:map [:nested [:vector :string]]]]]]
+ [:deep/merge [:map [:alice :string] [:bob :string]]]]

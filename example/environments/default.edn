@@ -2,6 +2,8 @@
  :optional/value "some-val"
  :truthy/value true
  :nested/map {:some 19}
+ :deep/merge {:alice "from-default"
+              :bob "from-default"}
  :nested {:inner "some-inner-value"}
  :include/json {:confr/resolver :json-file
                 :json-file "include.json"}}
