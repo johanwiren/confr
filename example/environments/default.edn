@@ -1,0 +1,7 @@
+{:admin/password "default-password"
+ :optional/value "some-val"
+ :truthy/value true
+ :nested/map {:some 19}
+ :nested {:inner "some-inner-value"}
+ :include/json {:confr/resolver :json-file
+                :json-file "include.json"}}

@@ -1,0 +1,9 @@
+[:map
+ {:registry {:ip/port [:int {:min 0 :max 65535}]}}
+ [:http.server/port :ip/port]
+ [:admin/password :string]
+ [:optional/value [:maybe :string]]
+ [:truthy/value :boolean]
+ [:nested/map [:map [:some :int]]]
+ [:nested [:map [:inner :string]]]
+ [:include/json [:map [:a [:map [:nested [:vector :string]]]]]]]

@@ -1,0 +1,6 @@
+#!/usr/bin/env bb
+
+(ns confr
+  (:require [confr.cli :as cli]))
+
+(apply cli/-main *command-line-args*)

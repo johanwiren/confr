@@ -1,0 +1,10 @@
+{:confr/include ["default"]
+ :http.server/port {:confr/resolver :json-file
+                    :json-file "dev.port"}
+ :admin/password {:confr/resolver :file
+                  :file "dev.password"}
+ :nested {:inner {:confr/resolver :file
+                  :file "dev.password"}}
+ :optional/value "some-val"
+ :truthy/value true
+ :nested/map {:some 42}}

@@ -1,0 +1,4 @@
+{:confr/include ["default"]
+ :http.server/port 8081
+ :admin/password {:confr/resolver :aws.secretsmanager/secret-string
+                  :secret-id "keys-to-the-castle"}}
