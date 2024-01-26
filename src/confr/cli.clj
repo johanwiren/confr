@@ -43,7 +43,7 @@
                                            :coerce boolean
                                            :desc "Displays this help message"})
         help-fn (fn [_]
-                  (println (format "Usage: confr %s %s [opts]"
+                  (println (format "Usage: confr %s %s [options]"
                                    (apply str (:cmds cmd))
                                    (str/join " " (map (comp #(format "<%s>" %) name) (:args->opts cmd)))))
                   (println)
@@ -62,6 +62,19 @@
                           (help-fn nil)
                           (f cmd')))))
         (assoc :error-fn help-fn))))
+
+(defn usage [_]
+  (println "Usage: confr <command> [args] [options]")
+  (println)
+  (println "Available commands:")
+  (println "  validate  validates an environment")
+  (println "  export    exports an environment")
+  (println "  diff      shows differences between environments")
+  (println "  generate  generates a valid random environment")
+  (println)
+  (println "To get help for a command run:")
+  (println "  confr <command> --help")
+  (println))
 
 (def dispatch-table
   [(-> {:cmds ["validate"]
@@ -96,6 +109,9 @@
        (with-defaults)
        (with-no-resolve)
        (with-formats)
+       (with-help))
+   (-> {:cmds []
+        :fn usage}
        (with-help))])
 
 (defn -main [& args]
