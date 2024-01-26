@@ -1,4 +1,4 @@
-{:confr/include ["default"]
+{:confr/include ["default" "alice" "bob"]
  :http.server/port {:confr/resolver :json-file
                     :json-file "dev.port"}
  :admin/password {:confr/resolver :file
@@ -7,5 +7,4 @@
                   :file "dev.password"}}
  :optional/value "some-val"
  :truthy/value true
- :deep/merge {:alice "from-dev"}
  :nested/map {:some 42}}
