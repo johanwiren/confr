@@ -5,5 +5,5 @@
  :deep/merge {:alice "from-default"
               :bob "from-default"}
  :nested {:inner "some-inner-value"}
- :include/json {:confr/resolver :json-file
+ :include/json {:confr/resolver :file/json
                 :json-file "include.json"}}

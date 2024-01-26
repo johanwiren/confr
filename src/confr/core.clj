@@ -50,10 +50,10 @@
                        (when (map? x)
                          (:confr/resolver x))))
 
-(defmethod resolve-val :file [{:keys [file]} opts]
+(defmethod resolve-val :file/plain [{:keys [file]} opts]
   (slurp (file-in-dir (env-dir opts) file)))
 
-(defmethod resolve-val :json-file [{:keys [json-file]} opts]
+(defmethod resolve-val :file/json [{:keys [json-file]} opts]
   (json/parse-string (slurp (file-in-dir (env-dir opts) json-file)) true))
 
 (defmethod resolve-val :aws.secretsmanager/secret-string [{:keys [secret-id]} _]

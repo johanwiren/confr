@@ -1,9 +1,9 @@
 {:confr/include ["default" "alice" "bob"]
- :http.server/port {:confr/resolver :json-file
+ :http.server/port {:confr/resolver :file/json
                     :json-file "dev.port"}
- :admin/password {:confr/resolver :file
+ :admin/password {:confr/resolver :file/plain
                   :file "dev.password"}
- :nested {:inner {:confr/resolver :file
+ :nested {:inner {:confr/resolver :file/plain
                   :file "dev.password"}}
  :optional/value "some-val"
  :truthy/value true
