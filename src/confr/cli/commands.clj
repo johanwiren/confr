@@ -13,7 +13,8 @@
 
 (defn- pretty-printer [{:keys [format]}]
   (case format
-    "edn" dd/pretty-print
+    "edn" (fn [x]
+            (dd/pretty-print x (dd/printer {:print-color (System/console)})))
     "json" (comp println to-json)
     "env-var" (comp println confr/export-env-vars (partial sort-by first) confr/env-vars)
     (comp println pr-str)))
