@@ -88,7 +88,7 @@
       (System/exit 1))
     (printer env)))
 
-(defn serve [{{:keys [env port once no-validate no-resolve format] :as opts} :opts}]
+(defn serve [{{:keys [env port ip once no-validate no-resolve format] :as opts} :opts}]
   (let [env (load-env env opts)
         schema (load-schema opts)
         formatter (case format
@@ -111,5 +111,6 @@
         (println (pr-str (me/humanize errors))))
       (System/exit 1))
     (reset! server (hks/run-server handler {:port port
+                                            :ip ip
                                             :legacy-return-value? true}))
     (@shutdown)))

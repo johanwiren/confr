@@ -116,6 +116,8 @@
         :fn cmds/serve
         :args->opts [:env]
         :spec {:env {:require true}
+               :ip {:default "127.0.0.1"
+                    :desc "Which ip address to listen on"}
                :port {:coerce :int
                       :default 8177
                       :desc "Port number for http server"}
