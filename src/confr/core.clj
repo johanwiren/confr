@@ -1,6 +1,7 @@
 (ns confr.core
   (:require [cheshire.core :as json]
             [clojure.edn :as edn]
+            [clojure.java.io :as io]
             [clojure.string :as str]
             [malli.core :as m]
             [malli.generator :as mg]
@@ -15,16 +16,22 @@
       (edn/read-string)
       (mu/closed-schema)))
 
-(defn deep-merge [& xs]
+(defn- deep-merge [& xs]
   (if (every? map? xs)
     (apply merge-with deep-merge xs)
     (last xs)))
 
+(defn- file-in-dir [dir file]
+  (io/file (format "%s/%s" dir file)))
+
+(defn- env-dir [{:keys [conf-dir]}]
+  (format "%s/environments" conf-dir))
+
 (declare load-env)
 
-(defn resolve-includes [{:confr/keys [include] :as env}
-                        {:keys [loaded-includes] :as opts
-                         :or {loaded-includes #{}}}]
+(defn- resolve-includes [{:confr/keys [include] :as env}
+                         {:keys [loaded-includes] :as opts
+                          :or {loaded-includes #{}}}]
   (when-let [circ (some loaded-includes include)]
     (binding [*out* *err*]
       (println "Circular dependency detected while loading" circ))
@@ -33,18 +40,21 @@
     (->> (conj (mapv #(load-env % opts) include) (dissoc env :confr/include))
          (apply deep-merge))))
 
-(defn load-env [env {:keys [conf-dir] :as opts}]
-  (resolve-includes (edn/read-string (slurp (format "%s/environments/%s.edn" conf-dir env))) opts))
+(defn load-env [env opts]
+  (let [env (-> (file-in-dir (env-dir opts) (str env ".edn"))
+                (slurp)
+                (edn/read-string))]
+    (resolve-includes env opts)))
 
 (defmulti resolve-val (fn [x _]
                        (when (map? x)
                          (:confr/resolver x))))
 
-(defmethod resolve-val :file [{:keys [file]} {:keys [conf-dir]}]
-  (slurp (format "%s/environments/%s" conf-dir file)))
+(defmethod resolve-val :file [{:keys [file]} opts]
+  (slurp (file-in-dir (env-dir opts) file)))
 
-(defmethod resolve-val :json-file [{:keys [json-file]} {:keys [conf-dir]}]
-  (json/parse-string (slurp (format "%s/environments/%s" conf-dir json-file)) true))
+(defmethod resolve-val :json-file [{:keys [json-file]} opts]
+  (json/parse-string (slurp (file-in-dir (env-dir opts) json-file)) true))
 
 (defmethod resolve-val :aws.secretsmanager/secret-string [{:keys [secret-id]} _]
   (let [sm (aws/client {:api :secretsmanager})]
