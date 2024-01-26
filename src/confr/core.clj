@@ -31,8 +31,6 @@
 (defn load-env [env {:keys [conf-dir] :as opts}]
   (resolve-includes (edn/read-string (slurp (format "%s/environments/%s.edn" conf-dir env))) opts))
 
-(declare resolve-vals)
-
 (defmulti resolve-val (fn [x _]
                        (when (map? x)
                          (:confr/resolver x))))
@@ -52,16 +50,15 @@
 (defmethod resolve-val :default [x opts]
   (cond
     (map? x)
-    (resolve-vals x opts)
+    (update-vals x #(resolve-val % opts))
 
     (sequential? x)
-    (map #(resolve-vals % opts) x)
+    (map #(resolve-val % opts) x)
 
     :else
     x))
 
-(defn resolve-vals [env opts]
-  (update-vals env #(resolve-val % opts)))
+(def resolve-vals resolve-val)
 
 (defn validate [schema env]
   (m/explain schema env))
