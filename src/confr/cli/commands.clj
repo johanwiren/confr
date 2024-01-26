@@ -19,9 +19,23 @@
     "env-var" (comp println confr/export-env-vars (partial sort-by first) confr/env-vars)
     (comp println pr-str)))
 
+(defmacro fail-with-message [msg-fn & body]
+  `(try ~@body
+        (catch Exception e#
+          (binding [*out* *err*]
+            (println (~msg-fn) (ex-message e#))
+            (System/exit 1)))))
+
 (defn- load-env [env {:keys [no-resolve] :as opts}]
-  (cond-> (confr/load-env env opts)
-    (not no-resolve) (confr/resolve-vals opts)))
+  (fail-with-message
+   #(format "Failed to load env %s" env)
+   (cond-> (confr/load-env env opts)
+     (not no-resolve) (confr/resolve-vals opts))))
+
+(defn- load-schema [opts]
+  (fail-with-message
+   (constantly "Failed to load schema")
+   (confr/load-schema opts)))
 
 (defn- find-envs [{:keys [conf-dir]}]
   (->> (io/file (str conf-dir "/environments"))
@@ -34,7 +48,7 @@
 
 (defn validate [{{:keys [env] :as opts} :opts}]
   (let [printer (pretty-printer opts)
-        schema (confr/load-schema opts)
+        schema (load-schema opts)
         envs (if env [env] (find-envs opts))
         results (->> envs
                      (map (juxt identity #(confr/validate schema (load-env % opts))))
@@ -47,7 +61,7 @@
 
 (defn generate [{:keys [opts]}]
   (let [printer (pretty-printer opts)]
-    (-> (confr/load-schema opts)
+    (-> (load-schema opts)
         (confr/generate)
         (printer))))
 
@@ -61,7 +75,7 @@
 
 (defn export [{{:keys [env no-validate no-resolve] :as opts} :opts}]
   (let [env (load-env env opts)
-        schema (confr/load-schema opts)
+        schema (load-schema opts)
         printer (pretty-printer opts)
         errors (and (not no-validate)
                     (not no-resolve)
