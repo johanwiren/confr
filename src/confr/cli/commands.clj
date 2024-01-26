@@ -4,7 +4,8 @@
             [clojure.string :as str]
             [confr.core :as confr]
             [malli.error :as me]
-            [lambdaisland.deep-diff2 :as dd]))
+            [lambdaisland.deep-diff2 :as dd]
+            [org.httpkit.server :as hks]))
 
 ;; Helper-functions
 
@@ -86,3 +87,29 @@
         (println (pr-str (me/humanize errors))))
       (System/exit 1))
     (printer env)))
+
+(defn serve [{{:keys [env port once no-validate no-resolve format] :as opts} :opts}]
+  (let [env (load-env env opts)
+        schema (load-schema opts)
+        formatter (case format
+                    "edn" pr-str
+                    "json" to-json)
+        errors (and (not no-validate)
+                    (not no-resolve)
+                    (confr/validate schema env))
+        shutdown (promise)
+        server (atom nil)
+        handler (fn [_]
+                  (when once
+                    (deliver shutdown @server))
+                  {:status 200
+                   :headers {"Content-type" (str "application/" format)}
+                   :body (formatter (confr/resolve-vals env opts))})]
+    (when errors
+      (binding [*out* *err*]
+        (println "Invalid environment")
+        (println (pr-str (me/humanize errors))))
+      (System/exit 1))
+    (reset! server (hks/run-server handler {:port port
+                                            :legacy-return-value? true}))
+    (@shutdown)))

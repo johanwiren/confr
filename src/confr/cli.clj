@@ -71,6 +71,7 @@
   (println "  export    exports an environment")
   (println "  diff      shows differences between environments")
   (println "  generate  generates a valid random environment")
+  (println "  serve     starts a http server serving the environment")
   (println)
   (println "To get help for a command run:")
   (println "  confr <command> --help")
@@ -110,6 +111,17 @@
        (with-defaults)
        (with-no-resolve)
        (with-formats)
+       (with-help))
+   (-> {:cmds ["serve"]
+        :fn cmds/serve
+        :args->opts [:env]
+        :spec {:env {:require true}
+               :port {:coerce :int
+                      :default 8177}
+               :once {:coerce boolean
+                      :default false}}}
+       (with-defaults)
+       (with-formats ["edn" "json"])
        (with-help))
    (-> {:cmds []
         :fn usage}
