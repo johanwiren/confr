@@ -10,7 +10,7 @@ Early stage, things will likely change.
 
 Confr is built using Babashka so the first step is to install [babashka](https://github.com/babashka/babashka#installation)
 
-Then run `./confr` and Babashka will start to download all dependencies
+Then copy *bin/confr* to somewhere within your `$PATH`
 
 ## Usage
 
